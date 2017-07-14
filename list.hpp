@@ -264,6 +264,22 @@ namespace cosmos
 		struct replace_at_detail<0, U, List<T, Rest...>> {
 			using type = List<U, Rest...>;
 		};
+
+		template<size_t Index, class List>
+		struct erase_front_impl;
+
+		template<size_t Index, template<class...> class List, class T, class... Rest>
+		struct erase_front_impl<Index, List<T, Rest...>> {
+			using type = typename erase_front_impl<Index - 1, List<Rest...>>::type;
+		};
+
+		template<template<class...> class List, class T, class... Rest>
+		struct erase_front_impl<0, List<T, Rest...>>
+		{
+			using type = List<T, Rest...>;
+		};
+
+		
 	}
 
 	template<size_t Index, class List>
@@ -310,4 +326,15 @@ namespace cosmos
 
 	template<size_t Index, class T, class List>
 	using replace_at = typename detail::replace_at_detail<Index, T, List>::type;
+
+	template<size_t Index, class List>
+	using erase_front = typename detail::erase_front_impl<Index, List>::type;
+
+	template<size_t Start, size_t End, class List>
+	struct slice_impl {
+		using type = erase_front<Start, split1<End, List>>;
+	};
+
+	template<size_t Start, size_t End, class List>
+	using slice = typename slice_impl<Start, End, List>::type;
 }
