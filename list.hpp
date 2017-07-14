@@ -279,7 +279,31 @@ namespace cosmos
 			using type = List<T, Rest...>;
 		};
 
-		
+		template<template<class...> class F, typename L>
+		struct transform_impl;
+
+		template<template<class...> class F, template<class...> class L>
+		struct transform_impl<F, L<>> {
+			using type = L<>;
+		};
+
+		template<template<class...> class F, template<class...> class L, class T, class... Rest>
+		struct transform_impl<F, L<T, Rest...>> {
+			//using _first = F<T>;
+			//using _rest = typename transform_impl<F, L<Rest...>>::type;
+
+			//using type = push_front<_rest, _first>;
+
+			using type = push_front<typename transform_impl<F, L<Rest...>>::type, F<T>>;
+		};
+
+		template<template<class...> class F, typename L>
+		struct transform_impl1;
+
+		template<template<class...> class F, template<class...> class L, class... T>
+		struct transform_impl1<F, L<T...>> {
+			using type = L<F<T>...>;
+		};
 	}
 
 	template<size_t Index, class List>
@@ -337,4 +361,7 @@ namespace cosmos
 
 	template<size_t Start, size_t End, class List>
 	using slice = typename slice_impl<Start, End, List>::type;
+
+	template<template<class...> class F, typename L>
+	using transform = typename detail::transform_impl1<F, L>::type;
 }

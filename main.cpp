@@ -7,6 +7,7 @@ void test_list()
 {
 	using namespace cosmos;
 	using my_list = list<int, bool>;
+	static_assert(std::is_same<transform<std::add_pointer_t, my_list>, list<int*, bool*>>::value, "no");
 	using my_list1 = push_back<my_list, char, double>;
 	static_assert(std::is_same<my_list1, list<int, bool, char, double>>::value, "no");
 	using my_list4 = list<bool, char, char, double, char>;
